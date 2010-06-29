@@ -23,7 +23,15 @@ class TestArSide < Test::Unit::TestCase
 
   context "User" do
     setup do
-      User.extend Bigamy::ActiveRecord::ClassMethods
+      Bigamy::ActiveRecord.corrupt User
+    end
+
+    teardown do
+      User.divorce_everyone
+    end
+
+    should "have divorce_everyone" do
+      assert User.respond_to?(:divorce_everyone)
     end
 
     context "that has_one_ar :doc" do

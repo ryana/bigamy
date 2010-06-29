@@ -1,18 +1,29 @@
 require 'mongo_mapper'
+require 'set'
 
 module Bigamy
   class NewRecordAssignment < StandardError; end
 
   module Mongo
     def self.configure(model)
+      model.class_inheritable_accessor :bigamy_methods
+      model.bigamy_methods = Set.new
     end
 
     module ClassMethods
+      def divorce_everyone
+        self.bigamy_methods.each {|v| undef_method(v) }
+        self.bigamy_methods = Set.new
+      end
+
       def belongs_to_ar name, options = {}, &ext
         primary_key = options.delete(:primary_key) || :id
         foreign_key = options.delete(:foreign_key) || :"#{name}_id"
         klass = options.delete(:class) || klass_from(name) 
 
+        serialize_foreign_key(klass, foreign_key)
+        add_accessors_to_bigamy_methods(name, foreign_key)
+        
         define_method(name) do
           self.id.nil? ? nil : klass.first(:conditions => {primary_key => self.id})
         end
@@ -31,6 +42,7 @@ module Bigamy
         klass = options.delete(:class) || klass_from(name) 
 
         serialize_foreign_key(klass, foreign_key)
+        add_accessors_to_bigamy_methods(name, foreign_key)
 
         define_method(name) do
           self.id.nil? ? nil : klass.first(:conditions => {foreign_key => self.id})
@@ -41,7 +53,6 @@ module Bigamy
           raise NewRecordAssignment.new('Parent must be saved') if self.new_record?
           raise TypeError unless val.is_a? klass
         
-      #  debugger
           val[foreign_key] = self.id.to_yaml
           val.save!
         end
@@ -53,6 +64,7 @@ module Bigamy
         klass = options.delete(:class) || klass_from(name)
 
         serialize_foreign_key(klass, foreign_key)
+        add_accessors_to_bigamy_methods(name, foreign_key)
 
         define_method(name) do
           self.id.nil? ? nil : klass.all(:conditions => {foreign_key => self.id})
@@ -64,6 +76,11 @@ module Bigamy
         
           val.each {|v| v.send "#{foreign_key}=", self.id; v.save! }
         end
+      end
+
+      def add_accessors_to_bigamy_methods name, f_key
+        bigamy_methods << name
+        bigamy_methods << "#{name}="
       end
 
       def serialize_foreign_key klass, f_key
@@ -91,5 +108,10 @@ module Bigamy
 
   module ActiveRecord
     ClassMethods = ::Bigamy::Mongo::ClassMethods
+
+    def self.corrupt klass
+      User.extend ClassMethods
+      ::Bigamy::Mongo.configure User
+    end
   end
 end

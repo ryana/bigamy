@@ -28,6 +28,10 @@ class TestMongoSide < Test::Unit::TestCase
       Doc.plugin Bigamy::Mongo
     end
 
+    teardown do
+      Doc.divorce_everyone
+    end
+
     context "that has_one_ar :user" do
       setup do
         Doc.has_one_ar :user
@@ -149,5 +153,4 @@ class TestMongoSide < Test::Unit::TestCase
       end
     end
   end
-
 end
