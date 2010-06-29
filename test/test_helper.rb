@@ -12,6 +12,7 @@ ActiveRecord::Migration.execute 'drop table if exists users'
 ActiveRecord::Migration.create_table :users do |t|
   t.string :name
   t.integer :id
+  t.string :doc_id
 end
 
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
