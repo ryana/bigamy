@@ -1,0 +1,5 @@
+require 'test/unit'
+require 'mocha'
+require 'ruby-debug'
+require 'shoulda'
+require 'factory_girl'

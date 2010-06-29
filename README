@@ -1,0 +1,11 @@
+= Bigamy
+
+Enable seamless Ruby-ness between ActiveRecord objects & MongoMapper documents
+
+= License
+
+Bigmay is released under the MIT license.
+
+= Support
+
+Just email me at ryan@angilly.com with questions, bugs, or patches.
