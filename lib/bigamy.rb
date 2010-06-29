@@ -88,4 +88,8 @@ module Bigamy
     module InstanceMethods
     end
   end
+
+  module ActiveRecord
+    ClassMethods = ::Bigamy::Mongo::ClassMethods
+  end
 end

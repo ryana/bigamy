@@ -15,6 +15,13 @@ ActiveRecord::Migration.create_table :users do |t|
   t.string :doc_id
 end
 
+class Doc
+  include MongoMapper::Document
+end
+
+class User < ActiveRecord::Base
+end
+
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 
 require 'bigamy'

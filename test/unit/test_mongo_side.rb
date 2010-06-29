@@ -1,12 +1,5 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-class Doc
-  include MongoMapper::Document
-end
-
-class User < ActiveRecord::Base
-end
-
 class TestMongoSide < Test::Unit::TestCase
 
   should "have Bigamy" do
@@ -117,6 +110,7 @@ class TestMongoSide < Test::Unit::TestCase
 
       end
     end
+
     context "that belongs_to_ar :user" do
       setup do
         Doc.belongs_to_ar :user
