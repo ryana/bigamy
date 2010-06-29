@@ -12,6 +12,9 @@ begin
     gemspec.add_development_dependency 'mocha', '0.9.8'
     gemspec.add_development_dependency 'factory_girl', '1.3.1'
     gemspec.add_development_dependency 'ruby-debug', '0.10.3'
+    gemspec.add_development_dependency 'mongo_mapper', '0.8.2'
+    gemspec.add_development_dependency 'active_record', '>=2.3.5'
+
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
