@@ -22,6 +22,8 @@ end
 class User < ActiveRecord::Base
 end
 
+Other = User
+
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 
 require 'bigamy'

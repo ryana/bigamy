@@ -1,14 +1,12 @@
 module Bigamy
 
   class Proxy
-    attr_accessor :name, :me, :primary_key, :foreign_key, :klass, :methods_added,
-      :options
+    attr_accessor :name, :me, :primary_key, :methods_added, :options
 
     def initialize parent, name, options
       self.name = name
       self.me = parent
       self.primary_key = options.delete(:primary_key) || :id
-      self.klass = options.delete(:class) || target_klass
       self.methods_added = Set.new
       self.options = options
 
@@ -18,7 +16,7 @@ module Bigamy
     end
 
     def foreign_key
-      options[:foreign_key] || :"#{name.to_s.singularize}_id"
+      raise
     end
 
     def create_accessors
@@ -51,8 +49,9 @@ module Bigamy
     end
 
     def target_klass
-      name.to_s.camelcase.singularize.constantize
+      options[:class] || name.to_s.camelcase.singularize.constantize
     end
+    alias klass target_klass
 
     def target_klass_name
       name.to_s.underscore.singularize.gsub('/', '_')

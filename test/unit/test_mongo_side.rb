@@ -37,10 +37,34 @@ class TestMongoSide < Test::Unit::TestCase
       assert User.included_modules.include?(Bigamy::ActiveRecord::InstanceMethods)
     end
 
+    should "use class option" do
+      Doc.has_one_ar :user, :class => Other
+      assert_equal Other, Doc.bigamy_associations[:user].target_klass
+    end
+
+    should "use foreign_key option" do
+      Doc.has_one_ar :user, :foreign_key => :random_thing
+      assert_equal :random_thing, Doc.bigamy_associations[:user].foreign_key
+    end
+
+    should "user primary_key option" do
+      Doc.has_one_ar :user, :primary_key => :random_thing
+      assert_equal :random_thing, Doc.bigamy_associations[:user].primary_key
+    end
+
     context "that has_one_ar :user" do
       setup do
         Doc.has_one_ar :user
         @user = User.create!
+      end
+
+      should "have correct target and root classes" do
+        assert_equal Doc, Doc.bigamy_associations[:user].root_klass
+        assert_equal User, Doc.bigamy_associations[:user].target_klass
+      end
+      
+      should "have correct foreign_key" do
+        assert_equal :doc_id, Doc.bigamy_associations[:user].foreign_key
       end
 
       should "create accessors" do
@@ -77,6 +101,15 @@ class TestMongoSide < Test::Unit::TestCase
     context "that has_many_ar :user" do
       setup do
         Doc.has_many_ar :users
+      end
+
+      should "have correct target and root classes" do
+        assert_equal Doc, Doc.bigamy_associations[:users].root_klass
+        assert_equal User, Doc.bigamy_associations[:users].target_klass
+      end
+      
+      should "have correct foreign_key" do
+        assert_equal :doc_id, Doc.bigamy_associations[:users].foreign_key
       end
 
       should "create accessors" do
@@ -125,6 +158,14 @@ class TestMongoSide < Test::Unit::TestCase
         Doc.belongs_to_ar :user
       end
 
+      should "have correct target and root classes" do
+        assert_equal Doc, Doc.bigamy_associations[:user].root_klass
+        assert_equal User, Doc.bigamy_associations[:user].target_klass
+      end
+      
+      should "have correct foreign_key" do
+        assert_equal :user_id, Doc.bigamy_associations[:user].foreign_key
+      end
       should "create accessors" do
         assert Doc.new.respond_to?(:user)
         assert Doc.new.respond_to?(:user=)
