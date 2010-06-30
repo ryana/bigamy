@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
      "README",
      "Rakefile",
      "VERSION",
+     "bigamy.gemspec",
      "lib/bigamy.rb",
      "lib/bigamy/ar.rb",
      "lib/bigamy/mongo.rb",
