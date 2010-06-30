@@ -2,22 +2,18 @@
 Enable seamless Ruby-ness between ActiveRecord objects & MongoMapper documents
 
 class User < ActiveRecord::Base
-  Bigamy.setup self
-
   has_one_mm :doc
   has_many_mm :photos
 end
 
 class Doc
   include MongoMapper::Document
-  Bigamy.setup self
 
   belongs_to_ar :user
 end
 
 class Photo
   include MongoMapper::Document
-  Bigamy.setup self
 
   belongs_to_ar :user
 end
@@ -56,10 +52,7 @@ All class methods take :foreign_key, :class, and :primary_key options as a hash
 
 
 == Setup
-Bigamy.setup can take any number of classes as arguments, and can be in an initializer like:
-
-Bigamy.setup User, Doc
-
+Bigamy installs itself into MongoMapper and ActiveRecord automatically.
 
 = License
 Bigmay is released under the MIT license.
