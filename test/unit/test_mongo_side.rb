@@ -125,6 +125,11 @@ class TestMongoSide < Test::Unit::TestCase
         assert Doc.new.respond_to?(:user=)
       end
 
+      should "create key" do
+        assert Doc.new.respond_to?(:user_id)
+        assert Doc.new.respond_to?(:user_id=)
+      end
+
       context "with an instance and user" do
         setup do
           @doc = Doc.new
