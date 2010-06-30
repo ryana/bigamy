@@ -34,9 +34,9 @@ class TestArSide < Test::Unit::TestCase
       assert User.respond_to?(:divorce_everyone)
     end
 
-    context "that has_one_ar :doc" do
+    context "that has_one_mm :doc" do
       setup do
-        User.has_one_ar :doc
+        User.has_one_mm :doc
         @doc = Doc.create!
       end
 
@@ -71,9 +71,9 @@ class TestArSide < Test::Unit::TestCase
       end
     end
 
-    context "that has_many_ar :doc" do
+    context "that has_many_mm :doc" do
       setup do
-        User.has_many_ar :docs
+        User.has_many_mm :docs
       end
 
       should "create accessors" do
@@ -117,9 +117,9 @@ class TestArSide < Test::Unit::TestCase
       end
     end
 
-    context "that belongs_to_ar :doc" do
+    context "that belongs_to_mm :doc" do
       setup do
-        User.belongs_to_ar :doc
+        User.belongs_to_mm :doc
       end
 
       should "create accessors" do

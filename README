@@ -1,11 +1,70 @@
 = Bigamy
-
 Enable seamless Ruby-ness between ActiveRecord objects & MongoMapper documents
 
-= License
+class User < ActiveRecord::Base
+  Bigamy.setup self
 
+  has_one_mm :doc
+  has_many_mm :photos
+end
+
+class Doc
+  include MongoMapper::Document
+  Bigamy.setup self
+
+  belongs_to_ar :user
+end
+
+class Photo
+  include MongoMapper::Document
+  Bigamy.setup self
+
+  belongs_to_ar :user
+end
+
+
+Bigamy sets foreign keys upon assignment.  It doesn't keep track of dirty children.
+It doesn't allow you to operate with new records.  So when you do:
+
+@user.doc = @doc
+
+- @user has to be saved already.
+- @doc has to be saved already.
+- @doc will have it's user_id attribute updated immediately.
+
+When you do:
+
+@user.photos = Photo.all
+
+- every Photo document will have it's user_id attribute set immediately
+
+
+== Options
+The available class methods are:
+
+For AR:
+  belongs_to_mm
+  has_one_mm
+  has_many_mm
+
+For MM:
+  belongs_to_ar
+  has_one_ar
+  has_many_ar
+
+All class methods take :foreign_key, :class, and :primary_key options as a hash
+
+
+== Setup
+Bigamy.setup can take any number of classes as arguments, and can be in an initializer like:
+
+Bigamy.setup User, Doc
+
+
+= License
 Bigmay is released under the MIT license.
 
-= Support
+It's developed by Ryan Angilly and released with the permission of MyPunchbowl.com
 
+= Support
 Just email me at ryan@angilly.com with questions, bugs, or patches.

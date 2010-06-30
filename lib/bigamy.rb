@@ -1,4 +1,5 @@
 require 'mongo_mapper'
+require 'active_record'
 require 'set'
 
 require 'bigamy/proxy'
@@ -39,15 +40,15 @@ module Bigamy
         self.bigamy_associations.each {|k,v| v.divorce_everyone }
       end
 
-      def belongs_to_ar name, options = {}, &ext
+      def belongs_to_ar name, options = {}
         bigamy_associations[name] = MongoBelongsTo.new(self, name, options)
       end
 
-      def has_one_ar name, options = {}, &ext
+      def has_one_ar name, options = {}
         bigamy_associations[name] = MongoHasOne.new(self, name, options)
       end
 
-      def has_many_ar name, options = {}, &ext
+      def has_many_ar name, options = {}
         bigamy_associations[name] = MongoHasMany.new(self, name, options)
       end
     end
@@ -84,15 +85,15 @@ module Bigamy
         self.bigamy_associations.each {|k,v| v.divorce_everyone }
       end
 
-      def belongs_to_ar name, options = {}, &ext
+      def belongs_to_mm name, options = {}
         bigamy_associations[name] = ARBelongsTo.new(self, name, options)
       end
 
-      def has_one_ar name, options = {}, &ext
+      def has_one_mm name, options = {}
         bigamy_associations[name] = ARHasOne.new(self, name, options)
       end
 
-      def has_many_ar name, options = {}, &ext
+      def has_many_mm name, options = {}
         bigamy_associations[name] = ARHasMany.new(self, name, options)
       end
     end
