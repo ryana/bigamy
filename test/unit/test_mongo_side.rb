@@ -25,11 +25,16 @@ class TestMongoSide < Test::Unit::TestCase
 
   context "Doc" do
     setup do
-      Doc.plugin Bigamy::Mongo
+      Bigamy.setup Doc, User
     end
 
     teardown do
       Doc.divorce_everyone
+    end
+
+    should "setup bigamy" do
+      assert Doc.included_modules.include?(Bigamy::Mongo::InstanceMethods)
+      assert User.included_modules.include?(Bigamy::ActiveRecord::InstanceMethods)
     end
 
     context "that has_one_ar :user" do

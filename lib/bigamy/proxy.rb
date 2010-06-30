@@ -38,6 +38,11 @@ module Bigamy
     end
 
     def serialize_foreign_key
+      target_klass.class_eval <<-EOF
+        def #{foreign_key}
+          import_id_val read_val(:#{foreign_key})
+        end
+        EOF
     end
 
     def divorce_everyone
@@ -70,7 +75,7 @@ module Bigamy
     def add_getter 
       me.class_eval <<-EOF
         def #{name}
-          self.id.nil? ? nil : #{target_klass}.first(:conditions => {:#{foreign_key} => self.id.to_s})
+          self.id.nil? ? nil : #{target_klass}.first(:conditions => {:#{foreign_key} => export_id_val(self.id)})
         end
       EOF
     end
@@ -82,7 +87,7 @@ module Bigamy
           raise NewRecordAssignment.new('Parent must be saved') if self.new_record?
           raise TypeError unless v.is_a? #{klass}
 
-          v.#{foreign_key} = self.id.to_s
+          v.#{foreign_key} = export_id_val(self.id)
           v.save!
         end
       EOF
@@ -97,7 +102,7 @@ module Bigamy
     def add_getter 
       me.class_eval <<-EOF
         def #{name}
-          self.id.nil? ? nil : #{target_klass}.all(:conditions => {:#{foreign_key} => self.id.to_s})
+          self.id.nil? ? nil : #{target_klass}.all(:conditions => {:#{foreign_key} => export_id_val(self.id)})
         end
       EOF
     end
@@ -108,7 +113,7 @@ module Bigamy
           raise NewRecordAssignment.new('All children must be saved') if val.select(&:new_record?).present?
           raise NewRecordAssignment.new('Parent must be saved') if self.new_record?
 
-          val.each {|v| v.send "#{foreign_key}=", self.id.to_s; v.save! }
+          val.each {|v| v.send "#{foreign_key}=", export_id_val(self.id); v.save! }
         end
       EOF
     end
@@ -117,8 +122,6 @@ module Bigamy
   class BelongsTo < Proxy
     def initialize parent, name, options
       super
-
-      me.key foreign_key
     end
 
     def foreign_key
@@ -128,7 +131,7 @@ module Bigamy
     def add_getter
       code = <<-EOF
         def #{name}
-          self.id.blank? ? nil : #{klass}.first(:conditions => {:#{primary_key} => self.id.to_s})
+          self.id.blank? ? nil : #{klass}.first(:conditions => {:#{primary_key} => export_id_val(self.id)})
         end
       EOF
 
@@ -141,7 +144,7 @@ module Bigamy
           raise NewRecordAssignment if val.new_record?
           raise TypeError.new("Should get #{klass}") unless val.is_a? #{klass}
 
-          write_key :#{foreign_key}, val.id
+          set_value :#{foreign_key}, val.id
         end
       EOF
 

@@ -23,7 +23,7 @@ class TestArSide < Test::Unit::TestCase
 
   context "User" do
     setup do
-      Bigamy::ActiveRecord.corrupt User
+      Bigamy.setup User, Doc
     end
 
     teardown do
