@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{bigamy}
-  s.version = "0.1.1"
+  s.version = "0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ryan Angilly"]
@@ -30,7 +30,8 @@ Gem::Specification.new do |s|
      "test/test_helper.rb",
      "test/unit/test_ar_side.rb",
      "test/unit/test_helper.rb",
-     "test/unit/test_mongo_side.rb"
+     "test/unit/test_mongo_side.rb",
+     "test/unit/test_proxy.rb"
   ]
   s.homepage = %q{http://github.com/ryana/bigamy}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -42,7 +43,8 @@ Gem::Specification.new do |s|
      "test/test_helper.rb",
      "test/unit/test_ar_side.rb",
      "test/unit/test_helper.rb",
-     "test/unit/test_mongo_side.rb"
+     "test/unit/test_mongo_side.rb",
+     "test/unit/test_proxy.rb"
   ]
 
   if s.respond_to? :specification_version then
