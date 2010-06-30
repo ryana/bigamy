@@ -24,10 +24,6 @@ class TestMongoSide < Test::Unit::TestCase
   end
 
   context "Doc" do
-    setup do
-      Bigamy.setup Doc, User
-    end
-
     teardown do
       Doc.divorce_everyone
     end

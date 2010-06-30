@@ -24,8 +24,11 @@ module Bigamy
 
   module Base
     def self.configure(model)
-      model.class_inheritable_accessor :bigamy_associations
-      model.bigamy_associations = {}
+      class << model
+        def bigamy_associations
+          @bigamy_associations ||= {}
+        end
+      end
     end
   end
 
@@ -38,6 +41,7 @@ module Bigamy
     module ClassMethods
       def divorce_everyone
         self.bigamy_associations.each {|k,v| v.divorce_everyone }
+        self.bigamy_associations.clear
       end
 
       def belongs_to_ar name, options = {}
@@ -57,7 +61,7 @@ module Bigamy
       def set_value c, val
         write_key c, val
       end
-   
+
       def read_val c
         read_key c
       end
@@ -68,6 +72,12 @@ module Bigamy
 
       def import_id_val i
         i
+      end
+    end
+
+    module PluginAddition
+      def self.included(model)
+        model.plugin Bigamy::Mongo
       end
     end
   end
@@ -83,6 +93,7 @@ module Bigamy
     module ClassMethods
       def divorce_everyone
         self.bigamy_associations.each {|k,v| v.divorce_everyone }
+        self.bigamy_associations.clear
       end
 
       def belongs_to_mm name, options = {}
@@ -102,7 +113,7 @@ module Bigamy
       def set_value c, val
         self[c] = val
       end
-    
+
       def read_val c
         read_attribute c
       end
@@ -118,3 +129,6 @@ module Bigamy
   end
 
 end
+
+MongoMapper::Document.append_inclusions(Bigamy::Mongo::PluginAddition)
+Bigamy::ActiveRecord.configure(ActiveRecord::Base)

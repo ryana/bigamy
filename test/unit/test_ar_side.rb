@@ -22,10 +22,6 @@ class TestArSide < Test::Unit::TestCase
   end
 
   context "User" do
-    setup do
-      Bigamy.setup User, Doc
-    end
-
     teardown do
       User.divorce_everyone
     end
