@@ -147,7 +147,7 @@ module Bigamy
     def add_getter
       code = <<-EOF
         def #{name}
-          self.#{primary_key}.blank? ? nil : #{klass}.first(:conditions => {:#{primary_key} => export_id_val(self.#{primary_key})})
+          self.#{primary_key}.blank? ? nil : #{klass}.first(:conditions => {:#{primary_key} => export_id_val(self.#{foreign_key})})
         end
       EOF
 
