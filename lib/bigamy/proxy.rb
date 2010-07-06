@@ -74,7 +74,7 @@ module Bigamy
     def add_getter 
       me.class_eval <<-EOF
         def #{name}
-          self.id.nil? ? nil : #{target_klass}.first(:conditions => {:#{foreign_key} => export_id_val(self.id)})
+          self.#{primary_key}.nil? ? nil : #{target_klass}.first(:conditions => {:#{foreign_key} => export_id_val(self.#{primary_key})})
         end
       EOF
     end
@@ -82,11 +82,20 @@ module Bigamy
     def add_setter
       me.class_eval <<-EOF
         def #{name}= v
-          raise NewRecordAssignment.new('Child must be saved') if v.new_record?
-          raise NewRecordAssignment.new('Parent must be saved') if self.new_record?
-          raise TypeError unless v.is_a? #{klass}
+          if v.nil?
+            new_id = nil
+          else
+            raise NewRecordAssignment.new('Child must be saved') if v.new_record?
+            raise NewRecordAssignment.new('Parent must be saved') if self.new_record?
+            raise TypeError unless v.is_a? #{klass}
+            new_id = export_id_val(self.#{primary_key})
+          end
 
-          v.#{foreign_key} = export_id_val(self.id)
+          if #{name}
+            #{name}.update_attributes :#{foreign_key} => nil
+          end
+
+          v.#{foreign_key} = new_id
           v.save!
         end
       EOF
@@ -101,7 +110,7 @@ module Bigamy
     def add_getter 
       me.class_eval <<-EOF
         def #{name}
-          self.id.nil? ? nil : #{target_klass}.all(:conditions => {:#{foreign_key} => export_id_val(self.id)})
+          self.#{primary_key}.nil? ? nil : #{target_klass}.all(:conditions => {:#{foreign_key} => export_id_val(self.#{primary_key})})
         end
       EOF
     end
@@ -109,10 +118,18 @@ module Bigamy
     def add_setter
       me.class_eval <<-EOF
         def #{name}= val
-          raise NewRecordAssignment.new('All children must be saved') if val.select(&:new_record?).present?
-          raise NewRecordAssignment.new('Parent must be saved') if self.new_record?
+          val ||= []
+          if val == []
+            new_id = nil
+          else
+            raise NewRecordAssignment.new('All children must be saved') if val.select(&:new_record?).present?
+            raise NewRecordAssignment.new('Parent must be saved') if self.new_record?
+            new_id = export_id_val(self.#{primary_key})
+          end
+          
+          #{name}.each {|x| x.update_attributes :#{foreign_key} => nil }
 
-          val.each {|v| v.send "#{foreign_key}=", export_id_val(self.id); v.save! }
+          val.each {|v| v.send "#{foreign_key}=", new_id; v.save! }
         end
       EOF
     end
@@ -130,7 +147,7 @@ module Bigamy
     def add_getter
       code = <<-EOF
         def #{name}
-          self.id.blank? ? nil : #{klass}.first(:conditions => {:#{primary_key} => export_id_val(self.id)})
+          self.#{primary_key}.blank? ? nil : #{klass}.first(:conditions => {:#{primary_key} => export_id_val(self.#{primary_key})})
         end
       EOF
 
@@ -140,10 +157,15 @@ module Bigamy
     def add_setter
       code = <<-EOF
         def #{name}= val
+          if val.nil?
+            set_value(:#{foreign_key}, nil)
+            return
+          end
+          
           raise NewRecordAssignment if val.new_record?
           raise TypeError.new("Should get #{klass}") unless val.is_a? #{klass}
 
-          set_value :#{foreign_key}, val.id
+          set_value :#{foreign_key}, val.#{primary_key}
         end
       EOF
 

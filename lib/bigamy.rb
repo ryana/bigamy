@@ -125,6 +125,10 @@ module Bigamy
       def import_id_val i
         BSON::ObjectID.from_string(i)
       end
+
+      def reset_current_relationships f_key, f_id
+        collection.update({f_key => f_id}, {f_key => nil}, :multi => true, :upsert => false)
+      end
     end
   end
 

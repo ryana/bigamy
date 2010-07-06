@@ -101,6 +101,16 @@ class TestArSide < Test::Unit::TestCase
             @user.docs = [@u1, @u2]
           end
 
+          should "clear on nil assignment" do
+            @user.docs = nil
+            assert_equal [], Doc.find_by_user_id(@user.id)
+          end
+
+          should "clear on nil assignment" do
+            @user.docs = nil
+            assert_equal [], Doc.find_all_by_user_id(@user.id)
+          end
+
           should "assign user_id on docs" do
             assert Doc.find(@u1.id, @u2.id).all? {|x| x.user_id == @user.id}
           end
@@ -135,18 +145,28 @@ class TestArSide < Test::Unit::TestCase
           end
         end
 
-        context "with a saved doc" do
-          setup { @doc.save! }
-
-          should "save user" do
+        context "with a saved doc and user" do
+          setup do
+            @doc.save!
             @user.doc = @doc
             @user.save!
+          end
 
+          should "save user" do
             assert !@user.doc_id.nil?
             assert_equal @user.doc_id, @doc.id
             assert_equal 1, Doc.count
             assert_equal 1, User.count
           end
+
+          should "clear relationship on nil assignment" do
+            @user.doc = nil
+            @user.save!
+
+            u = User.find(@user.id)
+            assert_equal nil, u.doc_id
+          end
+
         end
       end
     end
